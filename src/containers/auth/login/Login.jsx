@@ -3,22 +3,24 @@ import { connect } from "react-redux";
 import { push } from "connected-react-router";
 
 import * as actions from "../../../store/actions";
+import { handleLoginApi } from "../../../services";
 import "./login.scss";
+import { userLoginFail, userLoginSuccess } from "../../../store/actions";
 
 class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: "",
+      email: "",
       password: "",
-      isShowPassword: true,
+      isShowPassword: false,
+      errorMessage: "",
     };
   }
-  handleOnChangeUsername = (value) => {
+  handleOnChangeEmail = (value) => {
     this.setState({
-      username: value,
+      email: value,
     });
-    console.log(this.state);
   };
 
   handleOnChangePassword = (value) => {
@@ -33,7 +35,27 @@ class Login extends Component {
     });
   };
 
-  handleLogin = (data) => {};
+  handleLoginForm = async (data) => {
+    this.setState({
+      errorMessage: "",
+    });
+    try {
+      const data = await handleLoginApi(this.state.email, this.state.password);
+      if (!data.userInfo) {
+        this.setState({
+          errorMessage: data.message,
+        });
+        this.props.userLoginFail();
+      } else {
+        this.props.userLoginSuccess(data.userInfo);
+      }
+    } catch (error) {
+      this.setState({
+        errorMessage: error.data.message,
+      });
+      userLoginFail();
+    }
+  };
 
   render() {
     return (
@@ -48,8 +70,8 @@ class Login extends Component {
                 className="form-control"
                 placeholder="Enter your email"
                 id="login-email"
-                value={this.state.username}
-                onChange={(e) => this.handleOnChangeUsername(e.target.value)}
+                value={this.state.email}
+                onChange={(e) => this.handleOnChangeEmail(e.target.value)}
               />
             </div>
             <div className="login-input col-12 form-group">
@@ -69,7 +91,7 @@ class Login extends Component {
                   onClick={this.handleShowHidePassword}
                 >
                   <i
-                    class={`eye-icon ${
+                    className={`eye-icon ${
                       this.state.isShowPassword
                         ? "fas fa-eye"
                         : "far fa-eye-slash"
@@ -78,8 +100,12 @@ class Login extends Component {
                 </span>
               </div>
             </div>
+            <div className="col-12 text-danger">{this.state.errorMessage}</div>
             <div className="col-12">
-              <button className="btn-login" onClick={() => this.handleLogin()}>
+              <button
+                className="btn-login"
+                onClick={() => this.handleLoginForm()}
+              >
                 Login
               </button>
             </div>
@@ -109,9 +135,11 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     navigate: (path) => dispatch(push(path)),
-    adminLoginSuccess: (adminInfo) =>
-      dispatch(actions.adminLoginSuccess(adminInfo)),
-    adminLoginFail: () => dispatch(actions.adminLoginFail()),
+    // adminLoginSuccess: (adminInfo) =>
+    //   dispatch(actions.adminLoginSuccess(adminInfo)),
+    userLoginFail: () => dispatch(actions.userLoginFail()),
+    userLoginSuccess: (userInfo) =>
+      dispatch(actions.userLoginSuccess(userInfo)),
   };
 };
 
