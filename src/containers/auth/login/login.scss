@@ -30,6 +30,20 @@
 
       .login-input {
         margin: 7px 0;
+        .custom-input__password {
+          position: relative;
+          .eye-icon__wrap {
+            display: block;
+            position: absolute;
+            z-index: 2;
+            top: 50%;
+            right: 5px;
+            transform: translateY(-50%);
+            &:hover {
+              cursor: pointer;
+            }
+          }
+        }
       }
 
       .btn-login {

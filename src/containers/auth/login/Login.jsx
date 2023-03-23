@@ -8,8 +8,32 @@ import "./login.scss";
 class Login extends Component {
   constructor(props) {
     super(props);
-    this.btnLogin = React.createRef();
+    this.state = {
+      username: "",
+      password: "",
+      isShowPassword: true,
+    };
   }
+  handleOnChangeUsername = (value) => {
+    this.setState({
+      username: value,
+    });
+    console.log(this.state);
+  };
+
+  handleOnChangePassword = (value) => {
+    this.setState({
+      password: value,
+    });
+  };
+
+  handleShowHidePassword = () => {
+    this.setState({
+      isShowPassword: !this.state.isShowPassword,
+    });
+  };
+
+  handleLogin = (data) => {};
 
   render() {
     return (
@@ -24,19 +48,40 @@ class Login extends Component {
                 className="form-control"
                 placeholder="Enter your email"
                 id="login-email"
+                value={this.state.username}
+                onChange={(e) => this.handleOnChangeUsername(e.target.value)}
               />
             </div>
             <div className="login-input col-12 form-group">
               <label htmlFor="login-password">Password:</label>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Enter your password"
-                id="login-password"
-              />
+              <div className="custom-input__password">
+                <input
+                  type={this.state.isShowPassword ? "text" : "password"}
+                  className="form-control"
+                  placeholder="Enter your password"
+                  id="login-password"
+                  value={this.state.password}
+                  onChange={(e) => this.handleOnChangePassword(e.target.value)}
+                />
+
+                <span
+                  className="eye-icon__wrap"
+                  onClick={this.handleShowHidePassword}
+                >
+                  <i
+                    class={`eye-icon ${
+                      this.state.isShowPassword
+                        ? "fas fa-eye"
+                        : "far fa-eye-slash"
+                    }`}
+                  ></i>
+                </span>
+              </div>
             </div>
             <div className="col-12">
-              <button className="btn-login">Login</button>
+              <button className="btn-login" onClick={() => this.handleLogin()}>
+                Login
+              </button>
             </div>
             <div className="col-12">
               <span className="forgot-password">Forgot your password?</span>
